@@ -16,20 +16,18 @@ module Day1 =
         File.ReadLines(path)
             |> Seq.map parseLine
 
-    let part1 path =
-        (50, parseFile path)
+    let private countZeros rots =
+        (50, rots)
             ||> Seq.scan (+)
             |> Seq.where (fun pos -> pos % 100 = 0)
             |> Seq.length
 
+    let part1 path =
+        parseFile path
+            |> countZeros
+
     let part2 path =
-        (50, parseFile path)
-            ||> Seq.mapFold (fun pos rot ->
-                let seq =
-                    let sign = sign rot
-                    seq { pos + sign .. sign .. pos + rot }   // elegant but slow
-                seq, pos + rot)
-            |> fst
-            |> Seq.concat
-            |> Seq.where (fun pos -> pos % 100 = 0)
-            |> Seq.length
+        parseFile path
+            |> Seq.collect (fun rot ->
+                Seq.replicate (abs rot) (sign rot))
+            |> countZeros
