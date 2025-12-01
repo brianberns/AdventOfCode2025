@@ -13,7 +13,7 @@ module Day1 =
             | _ -> failwith "Unexpected"
 
     let private parseFile path =
-        File.ReadAllLines(path)
+        File.ReadLines(path)
             |> Seq.map parseLine
 
     let part1 path =
