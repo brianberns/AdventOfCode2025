@@ -12,19 +12,19 @@ module Day1 =
             | 'L' -> -rot
             | _ -> failwith "Unexpected"
 
+    let private parseFile path =
+        File.ReadAllLines(path)
+            |> Seq.map parseLine
+
     let part1 path =
-        let lines = File.ReadAllLines(path)
-        (50, lines)
-            ||> Seq.scan (fun pos line ->
-                pos + parseLine line)
+        (50, parseFile path)
+            ||> Seq.scan (+)
             |> Seq.where (fun pos -> pos % 100 = 0)
             |> Seq.length
 
     let part2 path =
-        let lines = File.ReadAllLines(path)
-        (50, lines)
-            ||> Seq.mapFold (fun pos line ->
-                let rot = parseLine line
+        (50, parseFile path)
+            ||> Seq.mapFold (fun pos rot ->
                 let seq =
                     let sign = sign rot
                     seq { pos + sign .. sign .. pos + rot }   // elegant but slow
