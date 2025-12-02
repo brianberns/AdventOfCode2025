@@ -14,9 +14,9 @@ module Day2 =
                 Int64.Parse split[0],
                 Int64.Parse split[1])
 
-    let isValid n (str : string) =
-        if str.Length % n = 0 then
-            let size = str.Length / n
+    let isValid nChunks (str : string) =
+        if nChunks > 1 && str.Length % nChunks = 0 then
+            let size = str.Length / nChunks
             str
                 |> Seq.chunkBySize size
                 |> Seq.distinct
@@ -25,7 +25,7 @@ module Day2 =
 
     let getDivisors n =
         Array.sort [|
-            for m = 2 to int (sqrt (float n)) do
+            for m = 1 to int (sqrt (float n)) do
                 if n % m = 0 then
                     yield m
                     if n / m <> m then
@@ -34,7 +34,8 @@ module Day2 =
 
     let isValidAll (str : string) =
         getDivisors str.Length
-            |> Seq.forall (fun n -> isValid n str)
+            |> Seq.forall (fun n ->
+                isValid n str)
 
     let part1 path =
         parseFile path
