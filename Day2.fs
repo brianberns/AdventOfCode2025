@@ -46,10 +46,10 @@ module Day2 =
 
     let part1 path =
         getInputs path
-            |> Array.where (string >> isValid 2 >> not)
+            |> Array.Parallel.filter (string >> isValid 2 >> not)
             |> Array.sum
 
     let part2 path =
         getInputs path
-            |> Array.where (string >> isValidAll >> not)
+            |> Array.Parallel.filter (string >> isValidAll >> not)
             |> Array.sum
