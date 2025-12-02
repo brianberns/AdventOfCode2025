@@ -5,7 +5,7 @@ open System.IO
 
 module Day2 =
 
-    let private parseFile path =
+    let parseFile path =
         File.ReadAllText(path)
             .Split(',')
             |> Array.map (fun str ->
@@ -14,16 +14,40 @@ module Day2 =
                 Int64.Parse split[0],
                 Int64.Parse split[1])
 
-    let isValid (str : string) =
-        if str.Length % 2 = 0 then
-            let halfLen = str.Length / 2
-            str[.. halfLen - 1] <> str[halfLen ..]
+    let isValid n (str : string) =
+        if str.Length % n = 0 then
+            let size = str.Length / n
+            str
+                |> Seq.chunkBySize size
+                |> Seq.distinct
+                |> Seq.length > 1
         else true
+
+    let getDivisors n =
+        Array.sort [|
+            for m = 2 to int (sqrt (float n)) do
+                if n % m = 0 then
+                    yield m
+                    if n / m <> m then
+                        yield n / m
+        |]
+
+    let isValidAll (str : string) =
+        getDivisors str.Length
+            |> Seq.forall (fun n -> isValid n str)
 
     let part1 path =
         parseFile path
             |> Seq.collect (fun (a, b) ->
                 assert(b >= a)
                 seq { a .. b })
-            |> Seq.where (string >> isValid >> not)
+            |> Seq.where (string >> isValid 2 >> not)
+            |> Seq.sum
+
+    let part2 path =
+        parseFile path
+            |> Seq.collect (fun (a, b) ->
+                assert(b >= a)
+                seq { a .. b })
+            |> Seq.where (string >> isValidAll >> not)
             |> Seq.sum

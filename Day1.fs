@@ -5,18 +5,18 @@ open System.IO
 
 module Day1 =
 
-    let private parseLine (line : string) =
+    let parseLine (line : string) =
         let rot = Int32.Parse line[1..]
         match line[0] with
             | 'R' -> rot
             | 'L' -> -rot
             | _ -> failwith "Unexpected"
 
-    let private parseFile path =
+    let parseFile path =
         File.ReadLines(path)
             |> Seq.map parseLine
 
-    let private countZeros rots =
+    let countZeros rots =
         (50, rots)
             ||> Seq.scan (+)
             |> Seq.where (fun pos -> pos % 100 = 0)
