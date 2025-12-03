@@ -1,6 +1,5 @@
 namespace Advent
 
-open System
 open System.IO
 
 module Day3 =
@@ -12,7 +11,7 @@ module Day3 =
                     |> Array.map (fun c ->
                         int c - int '0'))
 
-    let rec getMaxSubseq len (items : 't[]) =
+    let rec getMaxSubseq len (items : _[]) =
         if len = 0 then Seq.empty
         else
             let i, item =
