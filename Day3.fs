@@ -12,18 +12,32 @@ module Day3 =
                     |> Array.map (fun c ->
                         int c - int '0'))
 
-    let getPairs (array : _[]) =
-        seq {
-            for i = 0 to array.Length - 2 do
-                for j = i + 1 to array.Length - 1 do
-                    array[i], array[j]
-        }
+    let rec getMaxSubseq len (items : 't[]) =
+        if len = 0 then Seq.empty
+        else
+            let i, item =
+                Array.indexed items[.. items.Length - len]
+                    |> Seq.maxBy snd
+            seq {
+                yield item
+                yield! getMaxSubseq (len - 1) items[i + 1 ..]
+            }
 
-    let toJolts (a, b) =
-        10 * a + b
+    let toJolts subseq =
+        (0L, subseq)
+            ||> Seq.fold (fun acc digit ->
+                10L * acc + int64 digit)
 
     let part1 path =
         parseFile path
             |> Seq.map (
-                getPairs >> Seq.map toJolts >> Seq.max)
+                getMaxSubseq 2
+                    >> toJolts)
+            |> Seq.sum
+
+    let part2 path =
+        parseFile path
+            |> Seq.map (
+                getMaxSubseq 12
+                    >> toJolts)
             |> Seq.sum
