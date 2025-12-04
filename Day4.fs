@@ -63,15 +63,10 @@ module Day4 =
                     else grid[row, col])
         grid, accessibles.Count
 
-    let removeLoop grid =
-
-        let rec loop grid =
-            let grid, count = removeAccessibles grid
-            if count = 0 then 0
-            else
-                count + loop grid
-
-        loop grid
+    let rec removeLoop grid =
+        let grid, count = removeAccessibles grid
+        if count = 0 then 0
+        else count + removeLoop grid
 
     let part2 path =
         parseFile path
