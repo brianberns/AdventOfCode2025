@@ -53,11 +53,15 @@ module Day4 =
             |> Array.length
 
     let removeAccessibles grid=
-        let accessibles = getAccessibles grid
-        let grid = Array2D.copy grid
-        for row, col in accessibles do
-            grid[row, col] <- false
-        grid, accessibles.Length
+        let accessibles = set (getAccessibles grid)
+        let grid =
+            Array2D.init
+                (grid.GetLength(0))
+                (grid.GetLength(1))
+                (fun row col ->
+                    if accessibles.Contains(row, col) then false
+                    else grid[row, col])
+        grid, accessibles.Count
 
     let removeLoop grid =
 
