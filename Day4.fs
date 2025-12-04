@@ -65,13 +65,13 @@ module Day4 =
 
     let removeLoop grid =
 
-        let rec loop count grid =
-            let grid, incr = removeAccessibles grid
-            if incr = 0 then count
+        let rec loop grid =
+            let grid, count = removeAccessibles grid
+            if count = 0 then 0
             else
-                loop (count + incr) grid
+                count + loop grid
 
-        loop 0 grid
+        loop grid
 
     let part2 path =
         parseFile path
