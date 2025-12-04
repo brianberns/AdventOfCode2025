@@ -52,7 +52,7 @@ module Day4 =
             |> getAccessibles
             |> Array.length
 
-    let removeAccessibles grid=
+    let removeAccessibles grid =
         let accessibles = set (getAccessibles grid)
         let grid =
             Array2D.init
