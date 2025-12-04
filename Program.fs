@@ -6,7 +6,6 @@ module Program =
 
     let problems =
         [
-            (*
             Day1.part1 >> string, "Day1.input.txt", "Day 1, part 1"
             Day1.part2 >> string, "Day1.input.txt", "Day 1, part 2"
 
@@ -15,13 +14,13 @@ module Program =
 
             Day3.part1 >> string, "Day3.input.txt", "Day 3, part 1"
             Day3.part2 >> string, "Day3.input.txt", "Day 3, part 2"
-            *)
 
-            Day4.part1, "Day4.input.txt", "Day 4, part 1"
+            Day4.part1 >> string, "Day4.input.txt", "Day 4, part 1"
+            Day4.part2 >> string, "Day4.input.txt", "Day 4, part 2"
         ]
     let stopwatch = Stopwatch()
     for f, input, name in problems do
         stopwatch.Restart()
         let result = f input
         stopwatch.Stop()
-        printfn $"{name}: %A{result} ({stopwatch.ElapsedMilliseconds} ms)"
+        printfn $"{name}: {result} ({stopwatch.ElapsedMilliseconds} ms)"
