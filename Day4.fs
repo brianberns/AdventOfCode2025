@@ -15,8 +15,10 @@ module Day4 =
                 |> Seq.map Array.length
                 |> Seq.distinct
                 |> Seq.length = 1)
-        Array2D.init jagged.Length jagged[0].Length (fun row col ->
-            jagged[row][col])
+        Array2D.init
+            jagged.Length
+            jagged[0].Length
+            (fun row col -> jagged[row][col])
 
     let getNeighbors row col (grid : _[,]) =
         seq {
@@ -37,23 +39,21 @@ module Day4 =
                 |> Seq.length < 4
         else false
 
-    let part1 path =
-        let grid = parseFile path
-        Array.length [|
+    let getAccessibles (grid : _[,]) =
+        [|
             for row = 0 to grid.GetLength(0) - 1 do
                 for col = 0 to grid.GetLength(1) - 1 do
                     if isAccessible row col grid then
                         row, col
         |]
 
-    let removeAccessibles (grid : _[,]) =
-        let accessibles =
-            [|
-                for row = 0 to grid.GetLength(0) - 1 do
-                    for col = 0 to grid.GetLength(1) - 1 do
-                        if isAccessible row col grid then
-                            row, col
-            |]
+    let part1 path =
+        parseFile path
+            |> getAccessibles
+            |> Array.length
+
+    let removeAccessibles grid=
+        let accessibles = getAccessibles grid
         let grid = Array2D.copy grid
         for row, col in accessibles do
             grid[row, col] <- false
