@@ -16,13 +16,10 @@ module Day5 =
             lines[.. iSep - 1]
                 |> Array.map (fun line ->
                     let parts = line.Split('-')
-                    assert(parts.Length = 2)
-                    let low = Int64.Parse(parts[0])
-                    let high = Int64.Parse(parts[1])
-                    low +-+ high)
+                    Int64.Parse(parts[0]) +-+ Int64.Parse(parts[1]))
 
-        let ids =        
-            lines[iSep + 1 .. ]
+        let ids =
+            lines[iSep + 1 ..]
                 |> Array.map Int64.Parse
 
         ranges, ids
@@ -30,18 +27,17 @@ module Day5 =
     let part1 path =
         let ranges, ids = parseFile path
         ids
-            |> Seq.where (fun id ->
-                Seq.exists (Range.contains id) ranges)
-            |> Seq.length
+            |> Array.where (fun id ->
+                Array.exists (Range.contains id) ranges)
+            |> Array.length
 
-    let getValue = function
+    let (~~) = function
         | Inclusive value -> value
         | _ -> failwith "Unexpected"
 
     let part2 path =
-        let ranges, _ = parseFile path
-        Range.merge ranges
-            |> Seq.sumBy (fun range ->
-                getValue range.Upper
-                    - getValue range.Lower
-                    + 1L)
+        parseFile path
+            |> fst
+            |> Range.merge
+            |> List.sumBy (fun range ->
+                ~~range.Upper - ~~range.Lower + 1L)
