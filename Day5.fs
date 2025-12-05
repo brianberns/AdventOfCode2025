@@ -5,6 +5,8 @@ open System.IO
 
 open FRange
 
+#nowarn "FS0025"
+
 module Day5 =
 
     let parseFile path =
@@ -15,8 +17,9 @@ module Day5 =
         let ranges =
             lines[.. iSep - 1]
                 |> Array.map (fun line ->
-                    let parts = line.Split('-')
-                    Int64.Parse(parts[0]) +-+ Int64.Parse(parts[1]))
+                    let parts =
+                        Array.map Int64.Parse (line.Split('-'))
+                    parts[0] +-+ parts[1])
 
         let ids =
             lines[iSep + 1 ..]
@@ -31,9 +34,7 @@ module Day5 =
                 Array.exists (Range.contains id) ranges)
             |> Array.length
 
-    let (~~) = function
-        | Inclusive value -> value
-        | _ -> failwith "Unexpected"
+    let (~~) (Inclusive value) = value
 
     let part2 path =
         parseFile path
