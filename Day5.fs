@@ -3,6 +3,8 @@ namespace Advent
 open System
 open System.IO
 
+open FRange
+
 module Day5 =
 
     let parseFile path =
@@ -15,8 +17,9 @@ module Day5 =
                 |> Array.map (fun line ->
                     let parts = line.Split('-')
                     assert(parts.Length = 2)
-                    Int64.Parse(parts[0]),
-                    Int64.Parse(parts[1]))
+                    let low = Int64.Parse(parts[0])
+                    let high = Int64.Parse(parts[1])
+                    low +-+ high)
 
         let ids =        
             lines[iSep + 1 .. ]
@@ -24,15 +27,21 @@ module Day5 =
 
         ranges, ids
 
-    let isInRange id (low, high) =
-        id >= low && id <= high
-
     let part1 path =
         let ranges, ids = parseFile path
         ids
             |> Seq.where (fun id ->
-                Seq.exists (isInRange id) ranges)
+                Seq.exists (Range.contains id) ranges)
             |> Seq.length
 
+    let getValue = function
+        | Inclusive value -> value
+        | _ -> failwith "Unexpected"
+
     let part2 path =
-        parseFile path
+        let ranges, _ = parseFile path
+        Range.merge ranges
+            |> Seq.sumBy (fun range ->
+                getValue range.Upper
+                    - getValue range.Lower
+                    + 1L)

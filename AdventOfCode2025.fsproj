@@ -29,4 +29,8 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FRange" Version="1.1.0" />
+  </ItemGroup>
+
 </Project>
