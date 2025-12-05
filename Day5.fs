@@ -12,13 +12,13 @@ module Day5 =
     let parseFile path =
         let lines = File.ReadAllLines(path)
         let iSep = Array.findIndex ((=) "") lines
-        assert(iSep >= 0 && iSep < lines.Length)
 
         let ranges =
             lines[.. iSep - 1]
                 |> Array.map (fun line ->
                     let parts =
-                        Array.map Int64.Parse (line.Split('-'))
+                        line.Split('-')
+                            |> Array.map Int64.Parse
                     parts[0] +-+ parts[1])
 
         let ids =
