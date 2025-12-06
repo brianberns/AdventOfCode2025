@@ -19,23 +19,20 @@ module Day6 =
 
     let part1 path =
         let lines = File.ReadAllLines(path)
-        let inputRows =
-            lines[.. lines.Length - 2]
-                |> Array.map (split >> Array.map Int64.Parse)
-        apply
-            (parseOps lines)
-            (Array.transpose inputRows)
+        lines[.. lines.Length - 2]
+            |> Array.map (split >> Array.map Int64.Parse)
+            |> Array.transpose
+            |> apply (parseOps lines)
 
     let part2 path =
         let lines = File.ReadAllLines(path)
-        let inputs =
-            let strs =
-                lines[0 .. lines.Length - 2]
-                    |> Array.map _.ToCharArray()
-                    |> Array.transpose
-                    |> Array.map (String >> _.Trim())
-            (strs, [[]])
-                ||> Array.foldBack (fun str (head :: tail) ->
-                    if str = "" then [] :: (head :: tail)     // start a new chunk
-                    else (Int64.Parse str :: head) :: tail)   // append to current chunk
-        apply (parseOps lines) inputs
+        let strs =
+            lines[0 .. lines.Length - 2]
+                |> Array.map _.ToCharArray()
+                |> Array.transpose
+                |> Array.map (String >> _.Trim())
+        (strs, [[]])
+            ||> Array.foldBack (fun str (head :: tail) ->
+                if str = "" then [] :: (head :: tail)     // start a new chunk
+                else (Int64.Parse str :: head) :: tail)   // append to current chunk
+            |> apply (parseOps lines)
