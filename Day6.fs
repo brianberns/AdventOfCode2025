@@ -5,9 +5,12 @@ open System.IO
 
 module Day6 =
 
+    let split (line : string) =
+        line.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+
     let parseOps (lines : string[]) : (int64 -> int64 -> int64)[] =
-        (Array.last lines)
-            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        Array.last lines
+            |> split
             |> Array.map (function
                 | "+" -> (+)
                 | "*" -> (*))
@@ -16,9 +19,8 @@ module Day6 =
         let lines = File.ReadAllLines(path)
         let inputRows =
             lines[.. lines.Length - 2]
-                |> Array.map (fun line ->
-                    line.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                        |> Array.map Int64.Parse)
+                |> Array.map (
+                    split >> Array.map Int64.Parse)
         inputRows, parseOps lines
 
     let part1 path =
@@ -26,9 +28,7 @@ module Day6 =
         Array.sum [|
             for col = 0 to inputRows[0].Length - 1 do
                 let inputs =
-                    inputRows
-                        |> Array.map (fun inputRow ->
-                            inputRow[col])
+                    Array.map (Array.item col) inputRows
                 let op = ops[col]
                 Array.reduce op inputs
         |]
