@@ -26,45 +26,26 @@ module Day6 =
             ||> Array.map2 Array.reduce
             |> Array.sum
 
-    let toNum chars =
-        let digits =
-            chars
-                |> Array.choose (function
-                    | ' ' -> None
-                    | c -> Some (int64 c - int64 '0'))
-        (0L, digits)
-            ||> Array.fold (fun acc n -> 10L * acc + n)
+    let chunkByEmptyString strs =
+        (strs, [[]])
+            ||> Array.foldBack (fun str (head :: tail) ->
+                if str = "" then
+                    [] :: (head :: tail)
+                else
+                    (Int64.Parse str :: head) :: tail)
 
     let parseFile2 path =
         let lines = File.ReadAllLines(path)
-        let inputCols =
-            [|
-                for col = lines[0].Length - 1 downto 0 do
-                    toNum [|
-                        for row = 0 to lines.Length - 2 do
-                            lines[row][col]
-                    |]
-            |]
-        let inputCols =
-            (inputCols, [])
-                ||> Array.foldBack (fun col acc ->
-                    if col = 0L then [] :: acc
-                    else
-                        match acc with
-                            | head :: tail ->
-                                (col :: head) :: tail
-                            | [] -> [[col]])
-                |> List.toArray
-        let ops =
-            parseOps lines
-                |> Array.rev
-        inputCols, ops
+        let inputs =
+            lines[0 .. lines.Length - 2]
+                |> Array.map _.ToCharArray()
+                |> Array.transpose
+                |> Array.map (String >> _.Trim())
+                |> chunkByEmptyString
+        inputs, List.ofArray (parseOps lines)
 
     let part2 path =
-        let inputCols, ops = parseFile2 path
-        Array.sum [|
-            for col = 0 to inputCols.Length - 1 do
-                let inputs = inputCols[col]
-                let op = ops[col]
-                List.reduce op inputs
-        |]
+        let inputs, ops = parseFile2 path
+        (ops, inputs)
+            ||> List.map2 List.reduce
+            |> List.sum
