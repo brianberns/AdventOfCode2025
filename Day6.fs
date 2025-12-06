@@ -11,22 +11,18 @@ module Day6 =
     let parseOps (lines : string[]) : (int64 -> int64 -> int64)[] =
         Array.last lines
             |> split
-            |> Array.map (function
-                | "+" -> (+)
-                | "*" -> (*))
+            |> Array.map (function "+" -> (+) | "*" -> (*))
 
     let parseFile1 path =
         let lines = File.ReadAllLines(path)
         let inputRows =
             lines[.. lines.Length - 2]
-                |> Array.map (
-                    split >> Array.map Int64.Parse)
+                |> Array.map (split >> Array.map Int64.Parse)
         inputRows, parseOps lines
 
     let part1 path =
         let inputRows, ops = parseFile1 path
-        let inputCols = Array.transpose inputRows
-        (ops, inputCols)
+        (ops, Array.transpose inputRows)
             ||> Array.map2 Array.reduce
             |> Array.sum
 
