@@ -27,10 +27,9 @@ module Day6 =
         let inputRows, ops = parseFile1 path
         Array.sum [|
             for col = 0 to inputRows[0].Length - 1 do
-                let inputs =
-                    Array.map (Array.item col) inputRows
-                let op = ops[col]
-                Array.reduce op inputs
+                inputRows
+                    |> Array.map (Array.item col)
+                    |> Array.reduce ops[col]
         |]
 
     let toNum chars =
