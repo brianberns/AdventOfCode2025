@@ -12,14 +12,19 @@ module Day6 =
         split (Array.last lines)
             |> Array.map (function "+" -> (+) | "*" -> (*))
 
+    let apply ops inputs =
+        (ops, inputs)
+            ||> Seq.map2 Seq.reduce
+            |> Seq.sum
+
     let part1 path =
         let lines = File.ReadAllLines(path)
         let inputRows =
             lines[.. lines.Length - 2]
                 |> Array.map (split >> Array.map Int64.Parse)
-        (parseOps lines, Array.transpose inputRows)
-            ||> Array.map2 Array.reduce
-            |> Array.sum
+        apply
+            (parseOps lines)
+            (Array.transpose inputRows)
 
     let part2 path =
         let lines = File.ReadAllLines(path)
@@ -33,6 +38,4 @@ module Day6 =
                 ||> Array.foldBack (fun str (head :: tail) ->
                     if str = "" then [] :: (head :: tail)     // start a new chunk
                     else (Int64.Parse str :: head) :: tail)   // append to current chunk
-        (List.ofArray (parseOps lines), inputs)
-            ||> List.map2 List.reduce
-            |> List.sum
+        apply (parseOps lines) inputs
