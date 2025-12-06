@@ -5,12 +5,12 @@ open System.IO
 
 module Day6 =
 
-    let parseOps (lines : string[]) =
+    let parseOps (lines : string[]) : (int64 -> int64 -> int64)[] =
         (Array.last lines)
             .Split(' ', StringSplitOptions.RemoveEmptyEntries)
             |> Array.map (function
-                | "+" -> (fun (x : int64) (y : int64) -> x + y)
-                | "*" -> (fun (x : int64) (y : int64) -> x * y)
+                | "+" -> (+)
+                | "*" -> (*)
                 | _ -> failwith "Unexpected")
 
     let parseFile1 path =
@@ -74,6 +74,5 @@ module Day6 =
             for col = 0 to inputCols.Length - 1 do
                 let inputs = inputCols[col]
                 let op = ops[col]
-                let x = List.reduce op inputs
-                x
+                List.reduce op inputs
         |]
