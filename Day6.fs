@@ -13,8 +13,7 @@ module Day6 =
             |> Array.map (function "+" -> (+) | "*" -> (*))
 
     let apply ops inputs =
-        (ops, inputs)
-            ||> Seq.map2 Seq.reduce
+        Seq.map2 Seq.reduce ops inputs
             |> Seq.sum
 
     let part1 path =
