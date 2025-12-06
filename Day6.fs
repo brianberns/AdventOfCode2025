@@ -26,22 +26,18 @@ module Day6 =
             ||> Array.map2 Array.reduce
             |> Array.sum
 
-    let chunkByEmptyString strs =
-        (strs, [[]])
-            ||> Array.foldBack (fun str (head :: tail) ->
-                if str = "" then
-                    [] :: (head :: tail)
-                else
-                    (Int64.Parse str :: head) :: tail)
-
     let parseFile2 path =
         let lines = File.ReadAllLines(path)
-        let inputs =
+        let strs =
             lines[0 .. lines.Length - 2]
                 |> Array.map _.ToCharArray()
                 |> Array.transpose
                 |> Array.map (String >> _.Trim())
-                |> chunkByEmptyString
+        let inputs =
+            (strs, [[]])
+                ||> Array.foldBack (fun str (head :: tail) ->
+                    if str = "" then [] :: (head :: tail)     // start a new chunk
+                    else (Int64.Parse str :: head) :: tail)   // append to current chunk
         inputs, List.ofArray (parseOps lines)
 
     let part2 path =
