@@ -17,19 +17,18 @@ module Day6 =
         let inputRows =
             lines[.. lines.Length - 2]
                 |> Array.map (split >> Array.map Int64.Parse)
-        let ops = parseOps lines
-        (ops, Array.transpose inputRows)
+        (parseOps lines, Array.transpose inputRows)
             ||> Array.map2 Array.reduce
             |> Array.sum
 
     let part2 path =
         let lines = File.ReadAllLines(path)
-        let strs =
-            lines[0 .. lines.Length - 2]
-                |> Array.map _.ToCharArray()
-                |> Array.transpose
-                |> Array.map (String >> _.Trim())
         let inputs =
+            let strs =
+                lines[0 .. lines.Length - 2]
+                    |> Array.map _.ToCharArray()
+                    |> Array.transpose
+                    |> Array.map (String >> _.Trim())
             (strs, [[]])
                 ||> Array.foldBack (fun str (head :: tail) ->
                     if str = "" then [] :: (head :: tail)     // start a new chunk
