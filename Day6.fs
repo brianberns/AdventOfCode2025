@@ -5,24 +5,25 @@ open System.IO
 
 module Day6 =
 
-    let parseFile path =
+    let parseOps (lines : string[]) =
+        (Array.last lines)
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            |> Array.map (function
+                | "+" -> (fun (x : int64) (y : int64) -> x + y)
+                | "*" -> (fun (x : int64) (y : int64) -> x * y)
+                | _ -> failwith "Unexpected")
+
+    let parseFile1 path =
         let lines = File.ReadAllLines(path)
         let inputRows =
             lines[.. lines.Length - 2]
                 |> Array.map (fun line ->
                     line.Split(' ', StringSplitOptions.RemoveEmptyEntries)
                         |> Array.map Int64.Parse)
-        let ops =
-            (Array.last lines)
-                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                |> Array.map (function
-                    | "+" -> (fun (x : int64) (y : int64) -> x + y)
-                    | "*" -> (fun (x : int64) (y : int64) -> x * y)
-                    | _ -> failwith "Unexpected")
-        inputRows, ops
+        inputRows, parseOps lines
 
     let part1 path =
-        let inputRows, ops = parseFile path
+        let inputRows, ops = parseFile1 path
         Array.sum [|
             for col = 0 to inputRows[0].Length - 1 do
                 let inputs =
@@ -33,7 +34,46 @@ module Day6 =
                 Array.reduce op inputs
         |]
 
+    let toNum chars =
+        let digits =
+            chars
+                |> Array.choose (function
+                    | ' ' -> None
+                    | c -> Some (int64 c - int64 '0'))
+        (0L, digits)
+            ||> Array.fold (fun acc n -> 10L * acc + n)
+
+    let parseFile2 path =
+        let lines = File.ReadAllLines(path)
+        let inputCols =
+            [|
+                for col = lines[0].Length - 1 downto 0 do
+                    toNum [|
+                        for row = 0 to lines.Length - 2 do
+                            lines[row][col]
+                    |]
+            |]
+        let inputCols =
+            (inputCols, [])
+                ||> Array.foldBack (fun col acc ->
+                    if col = 0L then [] :: acc
+                    else
+                        match acc with
+                            | head :: tail ->
+                                (col :: head) :: tail
+                            | [] -> [[col]])
+                |> List.toArray
+        let ops =
+            parseOps lines
+                |> Array.rev
+        inputCols, ops
 
     let part2 path =
-        parseFile path
-            |> ignore
+        let inputCols, ops = parseFile2 path
+        Array.sum [|
+            for col = 0 to inputCols.Length - 1 do
+                let inputs = inputCols[col]
+                let op = ops[col]
+                let x = List.reduce op inputs
+                x
+        |]
