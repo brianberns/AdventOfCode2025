@@ -8,7 +8,7 @@ module Day6 =
     let split (line : string) =
         line.Split(' ', StringSplitOptions.RemoveEmptyEntries)
 
-    let parseOps (lines : string[]) : (int64 -> int64 -> int64)[] =
+    let parseOps (lines : string[]) =
         split (Array.last lines)
             |> Array.map (function "+" -> (+) | "*" -> (*))
 
