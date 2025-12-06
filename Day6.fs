@@ -10,8 +10,7 @@ module Day6 =
             .Split(' ', StringSplitOptions.RemoveEmptyEntries)
             |> Array.map (function
                 | "+" -> (+)
-                | "*" -> (*)
-                | _ -> failwith "Unexpected")
+                | "*" -> (*))
 
     let parseFile1 path =
         let lines = File.ReadAllLines(path)

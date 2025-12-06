@@ -5,8 +5,6 @@ open System.IO
 
 open FRange
 
-#nowarn "FS0025"
-
 module Day5 =
 
     let parseFile path =
