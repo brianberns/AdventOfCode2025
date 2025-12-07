@@ -6,17 +6,17 @@ type Item = Beam of int64 | Splitter
 
 module Day7 =
 
-    let update iter (world : Map<_, _>[]) =
+    let update iter (world : (int * Item)[][]) =
         let splitterCols =
             set [
-                for (KeyValue(col : int, (item : Item))) in world[iter + 1] do
-                    if item.IsSplitter then col
+                for col, (item : Item) in world[iter + 1] do
+                    if item.IsSplitter then col : int
                     else ()
             ]
         let nextRow =
             let pairs =
                 [|
-                    for (KeyValue(col, item)) in world[iter] do
+                    for col, item in world[iter] do
                         match item with
                             | Beam n ->
                                 if splitterCols.Contains(col) then
@@ -38,20 +38,19 @@ module Day7 =
                                 let n = Seq.sumBy (fun (Beam n) -> n) items
                                 Beam n
                     col, item)
-                |> Map
         Array.updateAt (iter + 1) nextRow world
 
     let parseFile path =
         let lines = File.ReadAllLines(path)
         [|
             for line in lines do
-                Map [
+                [|
                     for col, c in Array.indexed (line.ToCharArray()) do
                         match c with
                             | 'S' -> col, Beam 1
                             | '^' -> col, Splitter
                             | '.' -> ()
-                ]
+                |]
         |]
 
     let run (world : _[]) =
@@ -62,12 +61,12 @@ module Day7 =
     let part1 path =
         let rows = parseFile path
         run rows
-            |> Seq.sumBy (fun itemMap ->
-                itemMap.Values
-                    |> Seq.where _.IsSplitter
+            |> Seq.sumBy (fun posItems ->
+                posItems
+                    |> Seq.where (snd >> _.IsSplitter)
                     |> Seq.length)
 
     let part2 path =
         let rows = parseFile path
         let last = run rows |> Array.last
-        Seq.sumBy (fun (Beam n) -> n) last.Values
+        Seq.sumBy (fun (_, Beam n) -> n) last
