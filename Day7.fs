@@ -4,36 +4,28 @@ open System.IO
 
 type Item = Beam of int64 | Splitter
 
-type World = Map<int (*col*), Item>[]
-
 module Day7 =
 
-    let update iter (world : World) : World =
-        let beamPairs =
-            world[iter]
-                |> Seq.choose (fun (KeyValue(col, item)) ->
-                    match item with
-                        | Beam n -> Some (col, n)
-                        | _ -> None)
-                |> Seq.toArray
+    let update iter (world : Map<_, _>[]) =
         let splitterCols =
-            world[iter + 1]
-                |> Seq.choose (fun (KeyValue(col, item)) ->
-                    if item.IsSplitter then Some col
-                    else None)
-                |> set
+            set [
+                for (KeyValue(col : int, (item : Item))) in world[iter + 1] do
+                    if item.IsSplitter then col
+                    else ()
+            ]
         let nextRow =
             let pairs =
                 [|
-                    for (col, n) in beamPairs do
-                        if splitterCols.Contains(col) then
-                            assert(not (splitterCols.Contains(col - 1)))
-                            assert(not (splitterCols.Contains(col + 1)))
-                            yield (col - 1), Beam n
-                            yield (col + 1), Beam n
-                            yield col, Splitter
-                        else
-                            yield col, Beam n
+                    for (KeyValue(col, item)) in world[iter] do
+                        match item with
+                            | Beam n ->
+                                if splitterCols.Contains(col) then
+                                    yield (col - 1), Beam n
+                                    yield (col + 1), Beam n
+                                    yield col, Splitter
+                                else
+                                    yield col, Beam n
+                            | _ -> ()
                 |]
             pairs
                 |> Array.groupBy fst
@@ -62,9 +54,9 @@ module Day7 =
                 ]
         |]
 
-    let run (rows : _[]) =
-        (rows, [0 .. rows.Length - 2])
-            ||> Seq.fold (fun (world : World) iter ->
+    let run (world : _[]) =
+        (world, [0 .. world.Length - 2])
+            ||> Seq.fold (fun world iter ->
                 update iter world)
 
     let part1 path =
