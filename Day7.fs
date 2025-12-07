@@ -6,7 +6,7 @@ type Item = Beam of int64 | Splitter
 
 module Day7 =
 
-    let update iter (world : (int * Item)[][]) =
+    let update iter (world : _[][]) =
         let splitterCols =
             set [
                 for col, (item : Item) in world[iter + 1] do
@@ -14,20 +14,18 @@ module Day7 =
                     else ()
             ]
         let nextRow =
-            let pairs =
-                [|
-                    for col, item in world[iter] do
-                        match item with
-                            | Beam n ->
-                                if splitterCols.Contains(col) then
-                                    yield (col - 1), Beam n
-                                    yield (col + 1), Beam n
-                                    yield col, Splitter
-                                else
-                                    yield col, Beam n
-                            | _ -> ()
-                |]
-            pairs
+            [|
+                for col, item in world[iter] do
+                    match item with
+                        | Beam n ->
+                            if splitterCols.Contains(col) then
+                                yield col - 1, Beam n
+                                yield col + 1, Beam n
+                                yield col, Splitter
+                            else
+                                yield col, Beam n
+                        | _ -> ()
+            |]
                 |> Array.groupBy fst
                 |> Array.map (fun (col, group) ->
                     let items = Array.map snd group
@@ -35,8 +33,9 @@ module Day7 =
                         match Array.tryExactlyOne items with
                             | Some item -> item
                             | None ->
-                                let n = Seq.sumBy (fun (Beam n) -> n) items
-                                Beam n
+                                items
+                                    |> Seq.sumBy (fun (Beam n) -> n)
+                                    |> Beam
                     col, item)
         Array.updateAt (iter + 1) nextRow world
 
