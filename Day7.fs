@@ -6,7 +6,7 @@ type Item = Beam of int64 | Splitter
 
 module Day7 =
 
-    let update iter (world : _[][]) =
+    let update (world : _[][]) iter =
         let splitterCols =
             set [
                 for col, (item : Item) in world[iter + 1] do
@@ -19,8 +19,7 @@ module Day7 =
                     match item with
                         | Beam n ->
                             if splitterCols.Contains(col) then
-                                yield col - 1, Beam n
-                                yield col + 1, Beam n
+                                yield col - 1, Beam n; yield col + 1, Beam n
                                 yield col, Splitter
                             else
                                 yield col, Beam n
@@ -30,42 +29,36 @@ module Day7 =
                 |> Array.map (fun (col, group) ->
                     let items = Array.map snd group
                     let item =
-                        match Array.tryExactlyOne items with
-                            | Some item -> item
-                            | None ->
-                                items
-                                    |> Seq.sumBy (fun (Beam n) -> n)
-                                    |> Beam
+                        if items.Length = 1 then items[0]
+                        else Array.sumBy (fun (Beam n) -> n) items |> Beam
                     col, item)
         Array.updateAt (iter + 1) nextRow world
 
     let parseFile path =
         let lines = File.ReadAllLines(path)
         [|
-            for line in lines do
-                [|
-                    for col, c in Array.indexed (line.ToCharArray()) do
-                        match c with
-                            | 'S' -> col, Beam 1
-                            | '^' -> col, Splitter
-                            | '.' -> ()
-                |]
+            for line in lines do [|
+                for col, c in Array.indexed (line.ToCharArray()) do
+                    match c with
+                        | 'S' -> col, Beam 1
+                        | '^' -> col, Splitter
+                        | '.' -> ()
+            |]
         |]
 
-    let run (world : _[]) =
-        (world, [0 .. world.Length - 2])
-            ||> Seq.fold (fun world iter ->
-                update iter world)
+    let run (world : _[][]) =
+        Array.fold update world [| 0 .. world.Length - 2 |]
 
     let part1 path =
-        let rows = parseFile path
-        run rows
-            |> Seq.sumBy (fun posItems ->
+        parseFile path
+            |> run
+            |> Array.sumBy (fun posItems ->
                 posItems
-                    |> Seq.where (snd >> _.IsSplitter)
-                    |> Seq.length)
+                    |> Array.where (snd >> _.IsSplitter)
+                    |> Array.length)
 
     let part2 path =
-        let rows = parseFile path
-        let last = run rows |> Array.last
-        Seq.sumBy (fun (_, Beam n) -> n) last
+        parseFile path
+            |> run
+            |> Array.last
+            |> Array.sumBy (fun (_, Beam n) -> n)
