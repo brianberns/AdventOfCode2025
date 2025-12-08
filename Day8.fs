@@ -76,4 +76,21 @@ module Day8 =
             |> Seq.reduce (*)
 
     let part2 path =
-        parseFile path
+
+        let rec loop ((((idA, idB), _) :: _) as pointDists) graph =
+            let pointDists, graph = update pointDists graph
+            if getCircuits graph |> Seq.length = 1 then
+                idA, idB
+            else loop pointDists graph
+
+        let pointMap, graph = parseFile path
+        let pointDists =
+            List.sortBy snd [
+                for i = 1 to pointMap.Count - 1 do
+                    for j = i + 1 to pointMap.Count do
+                        (i, j), dist pointMap[i] pointMap[j]
+            ]
+        let idA, idB = loop pointDists graph
+        let xa, _, _ = pointMap[idA]
+        let xb, _, _ = pointMap[idB]
+        xa * xb
