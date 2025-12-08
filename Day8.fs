@@ -5,6 +5,11 @@ open System.IO
 
 module Day8 =
 
+    let dist (xa, ya, za) (xb, yb, zb) =
+        (pown (xa - xb) 2 + pown (ya - yb) 2 + pown (za - zb) 2)
+            |> float
+            |> sqrt
+
     let parseFile path =
         let pointMap =
             File.ReadAllLines(path)
@@ -17,12 +22,13 @@ module Day8 =
             pointMap.Keys
                 |> Seq.map (fun id -> id, Set.empty)
                 |> Map
-        pointMap, graph
-
-    let dist (xa, ya, za) (xb, yb, zb) =
-        (pown (xa - xb) 2 + pown (ya - yb) 2 + pown (za - zb) 2)
-            |> float
-            |> sqrt
+        let pointDists =
+            List.sortBy snd [
+                for i = 0 to pointMap.Count - 2 do
+                    for j = i + 1 to pointMap.Count - 1 do
+                        (i, j), dist pointMap[i] pointMap[j]
+            ]
+        pointMap, pointDists, graph
 
     let connect idA idB (graph : Map<_, Set<_>>) =
         graph
@@ -47,13 +53,7 @@ module Day8 =
                     Some (seen, unseen - seen))
 
     let part1 path =
-        let pointMap, graph = parseFile path
-        let pointDists =
-            List.sortBy snd [
-                for i = 0 to pointMap.Count - 2 do
-                    for j = i + 1 to pointMap.Count - 1 do
-                        (i, j), dist pointMap[i] pointMap[j]
-            ]
+        let _, pointDists, graph = parseFile path
         let _, graph =
             ((pointDists, graph), [1..1000])
                 ||> Seq.fold (fun (pointDists, graph) _ ->
@@ -65,22 +65,14 @@ module Day8 =
             |> Seq.take 3
             |> Seq.reduce (*)
 
+    let rec updateLoop ((((idA, idB), _) :: _) as pointDists) graph =
+        let pointDists, graph = update pointDists graph
+        if getCircuits graph |> Seq.length = 1 then idA, idB
+        else updateLoop pointDists graph
+
     let part2 path =
-
-        let rec loop ((((idA, idB), _) :: _) as pointDists) graph =
-            let pointDists, graph = update pointDists graph
-            if getCircuits graph |> Seq.length = 1 then
-                idA, idB
-            else loop pointDists graph
-
-        let pointMap, graph = parseFile path
-        let pointDists =
-            List.sortBy snd [
-                for i = 0 to pointMap.Count - 2 do
-                    for j = i + 1 to pointMap.Count - 1 do
-                        (i, j), dist pointMap[i] pointMap[j]
-            ]
-        let idA, idB = loop pointDists graph
+        let pointMap, pointDists, graph = parseFile path
+        let idA, idB = updateLoop pointDists graph
         let xa, _, _ = pointMap[idA]
         let xb, _, _ = pointMap[idB]
         xa * xb
