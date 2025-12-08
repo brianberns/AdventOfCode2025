@@ -13,7 +13,7 @@ module Day8 =
     let parseFile path =
         let pointMap =
             File.ReadAllLines(path)
-                |> Array.mapi (fun id line ->
+                |> Seq.mapi (fun id line ->
                     let chunks =
                         line.Split(',') |> Array.map Int64.Parse
                     id, (chunks[0], chunks[1], chunks[2]))
@@ -58,8 +58,7 @@ module Day8 =
             ((pointDists, graph), [1..1000])
                 ||> Seq.fold (fun (pointDists, graph) _ ->
                     update pointDists graph)
-        let circuits = getCircuits graph |> Seq.toArray
-        circuits
+        getCircuits graph
             |> Seq.map _.Count
             |> Seq.sortDescending
             |> Seq.take 3
