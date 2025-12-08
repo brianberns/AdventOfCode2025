@@ -3,21 +3,17 @@ namespace Advent
 open System
 open System.IO
 
-type Id = int
-
-type Graph = Map<Id, Set<Id>>
-
 module Day8 =
 
     let parseFile path =
         let pointMap =
             File.ReadAllLines(path)
-                |> Array.mapi (fun i line ->
+                |> Array.mapi (fun id line ->
                     let chunks =
                         line.Split(',') |> Array.map Int64.Parse
-                    i + 1, (chunks[0], chunks[1], chunks[2]))
+                    id, (chunks[0], chunks[1], chunks[2]))
                 |> Map
-        let graph : Graph =
+        let graph =
             pointMap.Keys
                 |> Seq.map (fun id -> id, Set.empty)
                 |> Map
@@ -28,7 +24,7 @@ module Day8 =
             |> float
             |> sqrt
 
-    let connect idA idB (graph : Graph) =
+    let connect idA idB (graph : Map<_, Set<_>>) =
         graph
             |> Map.add idA (graph[idA].Add(idB))
             |> Map.add idB (graph[idB].Add(idA))
@@ -37,31 +33,25 @@ module Day8 =
         let graph = connect idA idB graph
         rest, graph
 
-    let getCircuits (graph : Graph) =
+    let getCircuits (graph : Map<_, _>) =
 
-        let rec walk id (seen : Set<_>) =
+        let rec walk (seen : Set<_>) id =
             if seen.Contains(id) then seen
-            else
-                let seen = seen.Add(id)
-                (seen, graph[id])
-                    ||> Seq.fold (fun seen id ->
-                        walk id seen)
+            else Seq.fold walk (seen.Add(id)) graph[id]
 
         set graph.Keys
-            |> Seq.unfold (fun unseen ->
-                if Set.isEmpty unseen then None
+            |> Seq.unfold (fun (unseen: Set<_>) ->
+                if unseen.IsEmpty then None
                 else
-                    let seen = walk (Seq.head unseen) Set.empty
-                    assert(seen - unseen |> Set.isEmpty)
-                    let unseen = unseen - seen
-                    Some (seen, unseen))
+                    let seen = walk Set.empty (Seq.head unseen)
+                    Some (seen, unseen - seen))
 
     let part1 path =
         let pointMap, graph = parseFile path
         let pointDists =
             List.sortBy snd [
-                for i = 1 to pointMap.Count - 1 do
-                    for j = i + 1 to pointMap.Count do
+                for i = 0 to pointMap.Count - 2 do
+                    for j = i + 1 to pointMap.Count - 1 do
                         (i, j), dist pointMap[i] pointMap[j]
             ]
         let _, graph =
@@ -86,8 +76,8 @@ module Day8 =
         let pointMap, graph = parseFile path
         let pointDists =
             List.sortBy snd [
-                for i = 1 to pointMap.Count - 1 do
-                    for j = i + 1 to pointMap.Count do
+                for i = 0 to pointMap.Count - 2 do
+                    for j = i + 1 to pointMap.Count - 1 do
                         (i, j), dist pointMap[i] pointMap[j]
             ]
         let idA, idB = loop pointDists graph
