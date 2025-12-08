@@ -36,8 +36,7 @@ module Day8 =
             |> Map.add idB (graph[idB].Add(idA))
 
     let update (((idA, idB), _) :: rest) graph =
-        let graph = connect idA idB graph
-        rest, graph
+        rest, connect idA idB graph
 
     let getCircuits (graph : Map<_, _>) =
 
@@ -46,7 +45,7 @@ module Day8 =
             else Seq.fold walk (seen.Add(id)) graph[id]
 
         set graph.Keys
-            |> Seq.unfold (fun (unseen: Set<_>) ->
+            |> Seq.unfold (fun unseen ->
                 if unseen.IsEmpty then None
                 else
                     let seen = walk Set.empty (Seq.head unseen)
