@@ -27,10 +27,13 @@ module Program =
 
             Day7.part1 >> string, "Day7.input.txt", "Day 7, part 1"
             Day7.part2 >> string, "Day7.input.txt", "Day 7, part 2"
-            *)
  
             Day8.part1 >> string, "Day8.input.txt", "Day 8, part 1"
             Day8.part2 >> string, "Day8.input.txt", "Day 8, part 2"
+            *)
+ 
+            Day9.part1 >> string, "Day9.input.txt", "Day 9, part 1"
+            Day9.part2 >> string, "Day9.input.txt", "Day 9, part 2"
        ]
     let stopwatch = Stopwatch()
     for f, input, name in problems do
